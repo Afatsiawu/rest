@@ -15,12 +15,17 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Serve static files from the root directory
-app.use(express.static(path.join(__dirname)));
+// Serve static files from the public directory
+app.use(express.static(path.join(__dirname, 'server/models/public')));
 
-// Basic test route
+// Serve the main HTML file
 app.get('/', (req, res) => {
-  res.send('Server is running!');
+  res.sendFile(path.join(__dirname, 'server/models/public', 'index.html'));
+});
+
+// Serve the order page
+app.get('/order', (req, res) => {
+  res.sendFile(path.join(__dirname, 'server/models/public', 'order.html'));
 });
 
 // API status route

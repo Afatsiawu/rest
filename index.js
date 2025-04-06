@@ -1,15 +1,12 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
-const dotenv = require('dotenv');
 const path = require('path');
-
-// Load environment variables
-dotenv.config();
+const config = require('./config');
 
 console.log('Starting server...');
-console.log('Environment:', process.env.NODE_ENV);
-console.log('MongoDB URI:', process.env.MONGODB_URI ? 'Set' : 'Not set');
+console.log('Environment:', config.nodeEnv);
+console.log('MongoDB URI:', config.mongodbUri);
 
 const app = express();
 
@@ -36,7 +33,7 @@ app.use((err, req, res, next) => {
   const message = err.message || 'Something went wrong!';
   res.status(statusCode).json({
     error: message,
-    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    stack: config.nodeEnv === 'development' ? err.stack : undefined
   });
 });
 
@@ -44,7 +41,7 @@ app.use((err, req, res, next) => {
 const connectDB = async () => {
   try {
     console.log('Attempting to connect to MongoDB...');
-    await mongoose.connect(process.env.MONGODB_URI, {
+    await mongoose.connect(config.mongodbUri, {
       serverSelectionTimeoutMS: 5000,
       retryWrites: true
     });
@@ -58,7 +55,6 @@ const connectDB = async () => {
 
 connectDB();
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.listen(config.port, () => {
+  console.log(`Server running on port ${config.port}`);
 });

@@ -45,11 +45,11 @@ npm start
    - Build Command: `npm install`
    - Start Command: `npm start`
 4. Add the following environment variables:
-   - `MONGODB_URI`: Your MongoDB Atlas connection string
+   - `MONGODB_URI`: mongodb+srv://afatsiawudavid134:qwerty5%4052@cluster0.8yvzgyp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
    - `NODE_ENV`: production
    - `PORT`: 10000 (Render's default port)
 
 ## API Endpoints
 
 - `/api/reservations`: Reservation management
-- `/api/orders`: Order management 
+- `/api/orders`: Order management

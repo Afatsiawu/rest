@@ -19,63 +19,92 @@ app.use(express.json());
 app.use(express.static(__dirname)); // Serves files from root directory (CSS, JS)
 app.use(express.static(path.join(__dirname, 'server/models/public'))); // Serves files from public directory (HTML, images)
 
+// MongoDB Schema for Reservations
+const reservationSchema = new mongoose.Schema({
+    name: String,
+    email: String,
+    phone: String,
+    guests: Number,
+    date: Date,
+    time: String,
+    specialRequests: String,
+    createdAt: { type: Date, default: Date.now }
+});
+
+const Reservation = mongoose.model('Reservation', reservationSchema);
+
+// MongoDB Schema for Orders
+const orderSchema = new mongoose.Schema({
+    name: String,
+    email: String,
+    phone: String,
+    address: String,
+    city: String,
+    postalCode: String,
+    deliveryNotes: String,
+    pickupTime: String,
+    orderType: String, // 'delivery' or 'pickup'
+    items: [{
+        name: String,
+        price: Number,
+        quantity: Number
+    }],
+    subtotal: Number,
+    deliveryFee: Number,
+    tax: Number,
+    total: Number,
+    status: { type: String, default: 'pending' },
+    createdAt: { type: Date, default: Date.now }
+});
+
+const Order = mongoose.model('Order', orderSchema);
+
+// Connect to MongoDB
+mongoose.connect(config.mongodbUri)
+    .then(() => console.log('Connected to MongoDB'))
+    .catch(err => console.error('MongoDB connection error:', err));
+
 // Serve the main HTML file
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'server/models/public', 'index.html'));
+    res.sendFile(path.join(__dirname, 'server/models/public', 'index.html'));
 });
 
 // Serve the order page
 app.get('/order', (req, res) => {
-  res.sendFile(path.join(__dirname, 'server/models/public', 'order.html'));
+    res.sendFile(path.join(__dirname, 'server/models/public', 'order.html'));
 });
 
-// API status route
-app.get('/api/status', (req, res) => {
-  res.json({
-    status: 'ok',
-    mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
-    environment: config.nodeEnv
-  });
+// Handle reservation submission
+app.post('/api/reservations', async (req, res) => {
+    try {
+        const reservation = new Reservation(req.body);
+        await reservation.save();
+        res.status(201).json({ message: 'Reservation created successfully', reservation });
+    } catch (error) {
+        console.error('Reservation error:', error);
+        res.status(500).json({ error: 'Failed to create reservation' });
+    }
 });
 
-// Routes
-app.use('/api/reservations', require('./server/routes/reservations'));
-app.use('/api/orders', require('./server/routes/orders'));
-
-// 404 handler
-app.use((req, res, next) => {
-  res.status(404).json({ error: 'Not Found' });
+// Handle order submission
+app.post('/api/orders', async (req, res) => {
+    try {
+        const order = new Order(req.body);
+        await order.save();
+        res.status(201).json({ message: 'Order created successfully', order });
+    } catch (error) {
+        console.error('Order error:', error);
+        res.status(500).json({ error: 'Failed to create order' });
+    }
 });
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  const statusCode = err.statusCode || 500;
-  const message = err.message || 'Something went wrong!';
-  res.status(statusCode).json({
-    error: message,
-    stack: config.nodeEnv === 'development' ? err.stack : undefined
-  });
+    console.error(err.stack);
+    res.status(500).json({ error: 'Something went wrong!' });
 });
 
-// MongoDB connection with retry logic
-const connectDB = async () => {
-  try {
-    console.log('Attempting to connect to MongoDB...');
-    await mongoose.connect(config.mongodbUri, {
-      serverSelectionTimeoutMS: 5000,
-      retryWrites: true
-    });
-    console.log('Successfully connected to MongoDB!');
-  } catch (err) {
-    console.error('MongoDB connection error:', err.message);
-    console.log('Retrying connection in 5 seconds...');
-    setTimeout(connectDB, 5000);
-  }
-};
-
-connectDB();
-
+// Start the server
 app.listen(config.port, () => {
-  console.log(`Server running on port ${config.port}`);
+    console.log(`Server is running on port ${config.port}`);
 });

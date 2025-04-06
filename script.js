@@ -44,24 +44,38 @@ document.addEventListener('DOMContentLoaded', function() {
     // Reservation form submission
     const reservationForm = document.getElementById('reservation-form');
     if (reservationForm) {
-        reservationForm.addEventListener('submit', async function(e) {
+        reservationForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            const formData = {
+                name: reservationForm.querySelector('[name="name"]').value,
+                email: reservationForm.querySelector('[name="email"]').value,
+                phone: reservationForm.querySelector('[name="phone"]').value,
+                guests: parseInt(reservationForm.querySelector('[name="guests"]').value),
+                date: reservationForm.querySelector('[name="date"]').value,
+                time: reservationForm.querySelector('[name="time"]').value,
+                specialRequests: reservationForm.querySelector('[name="special-requests"]').value
+            };
 
-            const formData = new FormData(reservationForm);
             try {
-                const response = await fetch('http://localhost:3000/api/reservations', {
+                const response = await fetch('/api/reservations', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(Object.fromEntries(formData))
+                    body: JSON.stringify(formData)
                 });
-                const data = await response.json();
-                alert('Thank you for your reservation! We will confirm shortly via email.');
-                reservationForm.reset();
+
+                if (response.ok) {
+                    alert('Reservation created successfully!');
+                    reservationForm.reset();
+                } else {
+                    const error = await response.json();
+                    alert('Failed to create reservation: ' + error.error);
+                }
             } catch (error) {
                 console.error('Error:', error);
-                alert('An error occurred while processing your reservation');
+                alert('An error occurred while creating the reservation');
             }
         });
     }
@@ -204,43 +218,55 @@ function initializeOrderPage() {
     const checkoutBtn = document.querySelector('.checkout-btn');
     if (checkoutBtn) {
         checkoutBtn.addEventListener('click', async () => {
-            if (!validateForms()) return;
+            const activeTab = document.querySelector('.order-tab.active').dataset.tab;
+            const form = document.getElementById(activeTab + '-form');
+            
+            if (!form) {
+                alert('Please select a delivery method');
+                return;
+            }
 
-            const orderData = {
+            const formData = {
+                orderType: activeTab,
+                name: form.querySelector('[name="name"]').value,
+                email: form.querySelector('[name="email"]').value,
+                phone: form.querySelector('[name="phone"]').value,
                 items: getCartItems(),
-                ...calculateTotal(),
-                deliveryInfo: document.querySelector('.order-tab[data-tab="delivery"]').classList.contains('active')
-                    ? {
-                        name: document.getElementById('name').value,
-                        phone: document.getElementById('phone').value,
-                        email: document.getElementById('email').value,
-                        address: document.getElementById('address').value,
-                        city: document.getElementById('city').value,
-                        postal: document.getElementById('postal').value,
-                        notes: document.getElementById('delivery-notes').value
-                    }
-                    : {
-                        name: document.getElementById('pickup-name').value,
-                        phone: document.getElementById('pickup-phone').value,
-                        email: document.getElementById('pickup-email').value,
-                        pickupTime: document.getElementById('pickup-time').value
-                    }
+                subtotal: parseFloat(document.querySelector('.subtotal .amount').textContent.replace('$', '')),
+                deliveryFee: parseFloat(document.querySelector('.delivery-fee .amount').textContent.replace('$', '')),
+                tax: parseFloat(document.querySelector('.tax .amount').textContent.replace('$', '')),
+                total: parseFloat(document.querySelector('.total .amount').textContent.replace('$', ''))
             };
 
+            if (activeTab === 'delivery') {
+                formData.address = form.querySelector('[name="address"]').value;
+                formData.city = form.querySelector('[name="city"]').value;
+                formData.postalCode = form.querySelector('[name="postal"]').value;
+                formData.deliveryNotes = form.querySelector('[name="delivery-notes"]').value;
+            } else {
+                formData.pickupTime = form.querySelector('[name="pickup-time"]').value;
+            }
+
             try {
-                const response = await fetch('http://localhost:3000/api/orders', {
+                const response = await fetch('/api/orders', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(orderData)
+                    body: JSON.stringify(formData)
                 });
-                const data = await response.json();
-                alert('Thank you for your order! We will process it shortly.');
-                resetOrderForm();
+
+                if (response.ok) {
+                    alert('Order placed successfully!');
+                    form.reset();
+                    clearCart();
+                } else {
+                    const error = await response.json();
+                    alert('Failed to place order: ' + error.error);
+                }
             } catch (error) {
                 console.error('Error:', error);
-                alert('An error occurred while processing your order');
+                alert('An error occurred while placing the order');
             }
         });
     }
@@ -360,49 +386,37 @@ function validateForms() {
 }
 
 function getCartItems() {
-    // Get all items with quantity > 0
-    return Array.from(document.querySelectorAll('.quantity-input'))
-        .filter(input => parseInt(input.value) > 0)
-        .map(item => {
-            return {
-                id: item.dataset.id,
-                name: item.dataset.name,
-                price: parseFloat(item.dataset.price),
-                quantity: parseInt(item.value)
-            };
-        });
-}
-
-function calculateTotal() {
-    const items = getCartItems();
-    const subtotal = items.reduce((total, item) => total + (item.price * item.quantity), 0);
-    const isDelivery = document.querySelector('.order-tab[data-tab="delivery"]').classList.contains('active');
-    const deliveryFee = isDelivery ? 5.00 : 0.00;
-    const tax = subtotal * 0.08; // 8% tax
-    const total = subtotal + deliveryFee + tax;
-
-    return {
-        subtotal,
-        deliveryFee,
-        tax,
-        total
-    };
-}
-
-function resetOrderForm() {
-    // Reset all quantity inputs
+    const items = [];
     document.querySelectorAll('.quantity-input').forEach(input => {
-        input.value = 0;
+        if (parseInt(input.value) > 0) {
+            items.push({
+                name: input.dataset.name,
+                price: parseFloat(input.dataset.price),
+                quantity: parseInt(input.value)
+            });
+        }
     });
+    return items;
+}
 
-    // Reset the active form
-    const isDelivery = document.querySelector('.order-tab[data-tab="delivery"]').classList.contains('active');
-    if (isDelivery) {
-        document.getElementById('delivery-form').reset();
-    } else {
-        document.getElementById('pickup-form').reset();
-    }
+function clearCart() {
+    document.querySelectorAll('.quantity-input').forEach(input => {
+        input.value = '0';
+    });
+    updateCartSummary();
+}
 
-    // Update the cart display
-    updateCart();
+function updateCartSummary() {
+    const items = getCartItems();
+    const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const deliveryFee = 5.00; // Example delivery fee
+    const tax = subtotal * 0.1; // 10% tax
+
+    document.querySelector('.subtotal .amount').textContent = `$${subtotal.toFixed(2)}`;
+    document.querySelector('.delivery-fee .amount').textContent = `$${deliveryFee.toFixed(2)}`;
+    document.querySelector('.tax .amount').textContent = `$${tax.toFixed(2)}`;
+    document.querySelector('.total .amount').textContent = `$${(subtotal + deliveryFee + tax).toFixed(2)}`;
+
+    const checkoutBtn = document.querySelector('.checkout-btn');
+    checkoutBtn.disabled = items.length === 0;
 }

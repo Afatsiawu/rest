@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Online - Ghana Flavors</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/order.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo">
+            <img src="images/logo.png" alt="Restaurant Logo">
+            <span class="brand-name">Ghana Flavors</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="index.html#menu">Menu</a></li>
+            <li><a href="index.html#about">About</a></li>
+            <li><a href="index.html#contact">Contact</a></li>
+            <li><a href="index.html#reservations" class="nav-cta">Book a Table</a></li>
+        </ul>
+        <div class="mobile-menu">
+            <i class="fas fa-bars"></i>
+        </div>
+    </nav>
+
+    <!-- Order Hero Section -->
+    <section class="order-hero">
+        <div class="order-hero-content">
+            <h1>Order Online</h1>
+            <p>Enjoy authentic Ghanaian cuisine at home</p>
+        </div>
+    </section>
+
+    <!-- Order Section -->
+    <section class="order-section">
+        <div class="order-container">
+            <div class="order-options">
+                <button class="order-tab active" data-tab="delivery">Delivery</button>
+                <button class="order-tab" data-tab="pickup">Pickup</button>
+            </div>
+
+            <div class="delivery-info active" id="delivery-tab">
+                <h3>Delivery Information</h3>
+                <form id="delivery-form">
+                    <div class="form-group">
+                        <input type="text" id="name" name="name" placeholder="Full Name" required>
+                        <input type="tel" id="phone" name="phone" placeholder="Phone Number" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" id="email" name="email" placeholder="Email Address" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="address" name="address" placeholder="Delivery Address" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="city" name="city" placeholder="City" required>
+                        <input type="text" id="postal" name="postal" placeholder="Postal Code" required>
+                    </div>
+                    <div class="form-group">
+                        <textarea id="delivery-notes" name="delivery-notes" placeholder="Delivery Instructions (optional)"></textarea>
+                    </div>
+                </form>
+            </div>
+
+            <div class="delivery-info" id="pickup-tab">
+                <h3>Pickup Information</h3>
+                <form id="pickup-form">
+                    <div class="form-group">
+                        <input type="text" id="pickup-name" name="name" placeholder="Full Name" required>
+                        <input type="tel" id="pickup-phone" name="phone" placeholder="Phone Number" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" id="pickup-email" name="email" placeholder="Email Address" required>
+                    </div>
+                    <div class="form-group">
+                        <select id="pickup-time" name="pickup-time" required>
+                            <option value="">Select Pickup Time</option>
+                            <option value="asap">As Soon As Possible</option>
+                            <option value="11:00">11:00 AM</option>
+                            <option value="11:30">11:30 AM</option>
+                            <option value="12:00">12:00 PM</option>
+                            <option value="12:30">12:30 PM</option>
+                            <option value="13:00">1:00 PM</option>
+                            <option value="13:30">1:30 PM</option>
+                            <option value="14:00">2:00 PM</option>
+                            <option value="14:30">2:30 PM</option>
+                            <option value="15:00">3:00 PM</option>
+                            <option value="15:30">3:30 PM</option>
+                            <option value="16:00">4:00 PM</option>
+                            <option value="16:30">4:30 PM</option>
+                            <option value="17:00">5:00 PM</option>
+                            <option value="17:30">5:30 PM</option>
+                            <option value="18:00">6:00 PM</option>
+                            <option value="18:30">6:30 PM</option>
+                            <option value="19:00">7:00 PM</option>
+                            <option value="19:30">7:30 PM</option>
+                            <option value="20:00">8:00 PM</option>
+                        </select>
+                    </div>
+                    <p class="pickup-address">
+                        <strong>Pickup Location:</strong> 123 Accra Street, Ghana
+                    </p>
+                </form>
+            </div>
+
+            <div class="order-menu">
+                <h3>Select Your Items</h3>
+
+                <!-- Main Dishes Section -->
+                <div class="menu-category">
+                    <h4 class="category-title">Main Dishes</h4>
+
+                    <div class="menu-item">
+                        <div class="item-image">
+                            <img src="images/jollof-rice.jpg" alt="Jollof Rice">
+                        </div>
+                        <div class="item-details">
+                            <h5>Jollof Rice</h5>
+                            <p class="item-description">Traditional Ghanaian rice dish cooked in seasoned tomato sauce with aromatic spices</p>
+                            <div class="item-price-actions">
+                                <span class="price">$12.99</span>
+                                <div class="quantity-controls">
+                                    <button class="quantity-btn minus" data-id="jollof-rice">-</button>
+                                    <input type="number" min="0" value="0" class="quantity-input" data-id="jollof-rice" data-price="12.99" data-name="Jollof Rice">
+                                    <button class="quantity-btn plus" data-id="jollof-rice">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="menu-item">
+                        <div class="item-image">
+                            <img src="images/waakye.jpg" alt="Waakye">
+                        </div>
+                        <div class="item-details">
+                            <h5>Waakye</h5>
+                            <p class="item-description">Rice and beans cooked with dried millet stalks, served with special waakye sauce</p>
+                            <div class="item-price-actions">
+                                <span class="price">$11.99</span>
+                                <div class="quantity-controls">
+                                    <button class="quantity-btn minus" data-id="waakye">-</button>
+                                    <input type="number" min="0" value="0" class="quantity-input" data-id="waakye" data-price="11.99" data-name="Waakye">
+                                    <button class="quantity-btn plus" data-id="waakye">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="menu-item">
+                        <div class="item-image">
+                            <img src="images/banku-and-Tilapia.jpg" alt="Banku with Tilapia">
+                        </div>
+                        <div class="item-details">
+                            <h5>Banku with Grilled Tilapia</h5>
+                            <p class="item-description">Fermented corn dough balls served with grilled tilapia and pepper sauce</p>
+                            <div class="item-price-actions">
+                                <span class="price">$15.99</span>
+                                <div class="quantity-controls">
+                                    <button class="quantity-btn minus" data-id="banku-tilapia">-</button>
+                                    <input type="number" min="0" value="0" class="quantity-input" data-id="banku-tilapia" data-price="15.99" data-name="Banku with Grilled Tilapia">
+                                    <button class="quantity-btn plus" data-id="banku-tilapia">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="menu-item">
+                        <div class="item-image">
+                            <img src="images/fufu-soup.jpg" alt="Fufu with Light Soup">
+                        </div>
+                        <div class="item-details">
+                            <h5>Fufu with Light Soup</h5>
+                            <p class="item-description">Pounded cassava and plantain dumplings served with spicy light soup and meat</p>
+                            <div class="item-price-actions">
+                                <span class="price">$14.99</span>
+                                <div class="quantity-controls">
+                                    <button class="quantity-btn minus" data-id="fufu-soup">-</button>
+                                    <input type="number" min="0" value="0" class="quantity-input" data-id="fufu-soup" data-price="14.99" data-name="Fufu with Light Soup">
+                                    <button class="quantity-btn plus" data-id="fufu-soup">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Drinks Section -->
+                <div class="menu-category">
+                    <h4 class="category-title">Traditional Drinks</h4>
+
+                    <div class="menu-item">
+                        <div class="item-image">
+                            <img src="images/sobolo.jpg" alt="Sobolo">
+                        </div>
+                        <div class="item-details">
+                            <h5>Sobolo</h5>
+                            <p class="item-description">Refreshing hibiscus drink spiced with ginger and pineapple</p>
+                            <div class="item-price-actions">
+                                <span class="price">$4.99</span>
+                                <div class="quantity-controls">
+                                    <button class="quantity-btn minus" data-id="sobolo">-</button>
+                                    <input type="number" min="0" value="0" class="quantity-input" data-id="sobolo" data-price="4.99" data-name="Sobolo">
+                                    <button class="quantity-btn plus" data-id="sobolo">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="menu-item">
+                        <div class="item-image">
+                            <img src="images/lamujin.jpg" alt="Lamujin">
+                        </div>
+                        <div class="item-details">
+                            <h5>Lamujin</h5>
+                            <p class="item-description">Refreshing lemon and ginger drink with mint</p>
+                            <div class="item-price-actions">
+                                <span class="price">$4.99</span>
+                                <div class="quantity-controls">
+                                    <button class="quantity-btn minus" data-id="lamujin">-</button>
+                                    <input type="number" min="0" value="0" class="quantity-input" data-id="lamujin" data-price="4.99" data-name="Lamujin">
+                                    <button class="quantity-btn plus" data-id="lamujin">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="order-summary">
+                <h3>Order Summary</h3>
+                <div class="cart-items">
+                    <!-- Cart items will be added dynamically -->
+                    <p class="empty-cart">Your cart is empty</p>
+                </div>
+                <div class="cart-totals">
+                    <div class="subtotal">
+                        <span>Subtotal:</span>
+                        <span class="amount">$0.00</span>
+                    </div>
+                    <div class="delivery-fee">
+                        <span>Delivery Fee:</span>
+                        <span class="amount">$0.00</span>
+                    </div>
+                    <div class="tax">
+                        <span>Tax:</span>
+                        <span class="amount">$0.00</span>
+                    </div>
+                    <div class="total">
+                        <span>Total:</span>
+                        <span class="amount">$0.00</span>
+                    </div>
+                </div>
+                <button class="checkout-btn" disabled>Proceed to Checkout</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="social-links">
+            <a href="#"><i class="fab fa-facebook"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+        </div>
+        <p>&copy; 2024 Ghana Flavors. All rights reserved.</p>
+    </footer>
+
+    <script src="/script.js"></script>
+</body>
+</html>

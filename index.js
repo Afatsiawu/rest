@@ -74,12 +74,65 @@ app.get('/order', (req, res) => {
     res.sendFile(path.join(__dirname, 'server/models/public', 'order.html'));
 });
 
+// Get all reservations
+app.get('/api/reservations', async (req, res) => {
+    try {
+        const reservations = await Reservation.find().sort({ createdAt: -1 });
+        res.json(reservations);
+    } catch (error) {
+        console.error('Error fetching reservations:', error);
+        res.status(500).json({ error: 'Failed to fetch reservations' });
+    }
+});
+
 // Handle reservation submission
 app.post('/api/reservations', async (req, res) => {
     try {
+        // Basic validation
+        const { name, email, phone, guests, date, time } = req.body;
+        
+        if (!name || !email || !phone || !guests || !date || !time) {
+            return res.status(400).json({ error: 'All fields are required' });
+        }
+
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({ error: 'Invalid email format' });
+        }
+
+        // Validate phone number (basic check)
+        const phoneRegex = /^\+?[\d\s-]{10,}$/;
+        if (!phoneRegex.test(phone)) {
+            return res.status(400).json({ error: 'Invalid phone number format' });
+        }
+
+        // Validate guests number
+        if (guests < 1 || guests > 20) {
+            return res.status(400).json({ error: 'Number of guests must be between 1 and 20' });
+        }
+
+        // Validate date and time
+        const reservationDate = new Date(date);
+        if (isNaN(reservationDate.getTime())) {
+            return res.status(400).json({ error: 'Invalid date format' });
+        }
+
         const reservation = new Reservation(req.body);
         await reservation.save();
-        res.status(201).json({ message: 'Reservation created successfully', reservation });
+        res.status(201).json({ 
+            message: 'Reservation created successfully', 
+            reservation: {
+                id: reservation._id,
+                name: reservation.name,
+                email: reservation.email,
+                phone: reservation.phone,
+                guests: reservation.guests,
+                date: reservation.date,
+                time: reservation.time,
+                specialRequests: reservation.specialRequests
+            }
+        });
     } catch (error) {
         console.error('Reservation error:', error);
         res.status(500).json({ error: 'Failed to create reservation' });

@@ -3,6 +3,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const path = require('path');
 const config = require('./config');
+const XLSX = require('xlsx');
 
 console.log('Starting server...');
 console.log('Environment:', config.nodeEnv);
@@ -228,6 +229,89 @@ app.post('/api/orders', async (req, res) => {
     } catch (error) {
         console.error('Order error:', error);
         res.status(500).json({ error: 'Failed to create order' });
+    }
+});
+
+// Export reservations to Excel
+app.get('/api/reservations/export', async (req, res) => {
+    try {
+        const reservations = await Reservation.find().sort({ createdAt: -1 });
+        
+        // Format data for Excel
+        const formattedData = reservations.map(reservation => ({
+            'Name': reservation.name,
+            'Email': reservation.email,
+            'Phone': reservation.phone,
+            'Guests': reservation.guests,
+            'Date': new Date(reservation.date).toLocaleDateString(),
+            'Time': reservation.time,
+            'Special Requests': reservation.specialRequests,
+            'Created At': new Date(reservation.createdAt).toLocaleString()
+        }));
+
+        // Create workbook and worksheet
+        const workbook = XLSX.utils.book_new();
+        const worksheet = XLSX.utils.json_to_sheet(formattedData);
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Reservations');
+
+        // Generate Excel file
+        const excelBuffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+
+        // Set response headers
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', 'attachment; filename=reservations.xlsx');
+        
+        // Send the Excel file
+        res.send(excelBuffer);
+    } catch (error) {
+        console.error('Export error:', error);
+        res.status(500).json({ error: 'Failed to export reservations' });
+    }
+});
+
+// Export orders to Excel
+app.get('/api/orders/export', async (req, res) => {
+    try {
+        const orders = await Order.find().sort({ createdAt: -1 });
+        
+        // Format data for Excel
+        const formattedData = orders.map(order => ({
+            'Order ID': order._id,
+            'Name': order.name,
+            'Email': order.email,
+            'Phone': order.phone,
+            'Order Type': order.orderType,
+            'Address': order.address || 'N/A',
+            'City': order.city || 'N/A',
+            'Postal Code': order.postalCode || 'N/A',
+            'Delivery Notes': order.deliveryNotes || 'N/A',
+            'Pickup Time': order.pickupTime || 'N/A',
+            'Items': order.items.map(item => `${item.name} (${item.quantity}x)`).join(', '),
+            'Subtotal': `$${order.subtotal.toFixed(2)}`,
+            'Delivery Fee': `$${order.deliveryFee.toFixed(2)}`,
+            'Tax': `$${order.tax.toFixed(2)}`,
+            'Total': `$${order.total.toFixed(2)}`,
+            'Status': order.status,
+            'Created At': new Date(order.createdAt).toLocaleString()
+        }));
+
+        // Create workbook and worksheet
+        const workbook = XLSX.utils.book_new();
+        const worksheet = XLSX.utils.json_to_sheet(formattedData);
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Orders');
+
+        // Generate Excel file
+        const excelBuffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+
+        // Set response headers
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', 'attachment; filename=orders.xlsx');
+        
+        // Send the Excel file
+        res.send(excelBuffer);
+    } catch (error) {
+        console.error('Export error:', error);
+        res.status(500).json({ error: 'Failed to export orders' });
     }
 });
 

@@ -15,8 +15,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Serve static files from the public directory
-app.use(express.static(path.join(__dirname, 'server/models/public')));
+// Serve static files from both root and public directories
+app.use(express.static(__dirname)); // Serves files from root directory (CSS, JS)
+app.use(express.static(path.join(__dirname, 'server/models/public'))); // Serves files from public directory (HTML, images)
 
 // Serve the main HTML file
 app.get('/', (req, res) => {

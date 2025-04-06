@@ -139,12 +139,92 @@ app.post('/api/reservations', async (req, res) => {
     }
 });
 
+// Get all orders
+app.get('/api/orders', async (req, res) => {
+    try {
+        const orders = await Order.find().sort({ createdAt: -1 });
+        res.json(orders);
+    } catch (error) {
+        console.error('Error fetching orders:', error);
+        res.status(500).json({ error: 'Failed to fetch orders' });
+    }
+});
+
 // Handle order submission
 app.post('/api/orders', async (req, res) => {
     try {
+        // Basic validation
+        const { name, email, phone, orderType, items } = req.body;
+        
+        if (!name || !email || !phone || !orderType || !items || items.length === 0) {
+            return res.status(400).json({ error: 'All required fields must be filled' });
+        }
+
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({ error: 'Invalid email format' });
+        }
+
+        // Validate phone number (basic check)
+        const phoneRegex = /^\+?[\d\s-]{10,}$/;
+        if (!phoneRegex.test(phone)) {
+            return res.status(400).json({ error: 'Invalid phone number format' });
+        }
+
+        // Validate order type
+        if (!['delivery', 'pickup'].includes(orderType)) {
+            return res.status(400).json({ error: 'Invalid order type' });
+        }
+
+        // Validate delivery information if order type is delivery
+        if (orderType === 'delivery') {
+            const { address, city, postalCode } = req.body;
+            if (!address || !city || !postalCode) {
+                return res.status(400).json({ error: 'Delivery address information is required' });
+            }
+        }
+
+        // Validate pickup time if order type is pickup
+        if (orderType === 'pickup') {
+            const { pickupTime } = req.body;
+            if (!pickupTime) {
+                return res.status(400).json({ error: 'Pickup time is required' });
+            }
+        }
+
+        // Validate items
+        if (!Array.isArray(items) || items.length === 0) {
+            return res.status(400).json({ error: 'At least one item must be ordered' });
+        }
+
+        for (const item of items) {
+            if (!item.name || !item.price || !item.quantity) {
+                return res.status(400).json({ error: 'Each item must have a name, price, and quantity' });
+            }
+            if (item.quantity < 1) {
+                return res.status(400).json({ error: 'Item quantity must be at least 1' });
+            }
+        }
+
         const order = new Order(req.body);
         await order.save();
-        res.status(201).json({ message: 'Order created successfully', order });
+        res.status(201).json({ 
+            message: 'Order created successfully', 
+            order: {
+                id: order._id,
+                name: order.name,
+                email: order.email,
+                phone: order.phone,
+                orderType: order.orderType,
+                items: order.items,
+                subtotal: order.subtotal,
+                deliveryFee: order.deliveryFee,
+                tax: order.tax,
+                total: order.total,
+                status: order.status
+            }
+        });
     } catch (error) {
         console.error('Order error:', error);
         res.status(500).json({ error: 'Failed to create order' });

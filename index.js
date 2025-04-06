@@ -7,6 +7,7 @@ const config = require('./config');
 console.log('Starting server...');
 console.log('Environment:', config.nodeEnv);
 console.log('MongoDB URI:', config.mongodbUri);
+console.log('Port:', config.port);
 
 const app = express();
 
@@ -16,6 +17,20 @@ app.use(express.json());
 
 // Serve static files from the root directory
 app.use(express.static(path.join(__dirname)));
+
+// Basic test route
+app.get('/', (req, res) => {
+  res.send('Server is running!');
+});
+
+// API status route
+app.get('/api/status', (req, res) => {
+  res.json({
+    status: 'ok',
+    mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    environment: config.nodeEnv
+  });
+});
 
 // Routes
 app.use('/api/reservations', require('./server/routes/reservations'));

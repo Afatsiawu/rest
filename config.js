@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 const config = {
-  port: process.env.PORT || 3000,
+  port: process.env.PORT || 10000,
   mongodbUri: process.env.MONGODB_URI || 'mongodb+srv://afatsiawudavid134:qwerty5%4052@cluster0.8yvzgyp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0',
   nodeEnv: process.env.NODE_ENV || 'development'
 };

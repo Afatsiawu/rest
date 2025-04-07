@@ -205,21 +205,44 @@ body {
     letter-spacing: 1px;
 }
 
-/* Mobile Menu */
+/* Mobile Navigation */
 .mobile-menu {
     display: none;
-    font-size: 1.5rem;
     cursor: pointer;
-    margin-left: 1rem;
+    font-size: 1.5rem;
+    color: var(--primary-color);
 }
 
 @media (max-width: 768px) {
-    .nav-links {
-        display: none;
-    }
-
     .mobile-menu {
         display: block;
+    }
+
+    .nav-links {
+        position: fixed;
+        top: 80px;
+        left: 0;
+        right: 0;
+        background-color: white;
+        flex-direction: column;
+        padding: 1rem;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        display: none;
+        transition: all 0.3s ease;
+    }
+
+    .nav-links.active {
+        display: flex;
+    }
+
+    .nav-links li {
+        margin: 1rem 0;
+        text-align: center;
+    }
+
+    .nav-links a {
+        display: block;
+        padding: 0.5rem 0;
     }
 
     .hero h1 {
@@ -756,4 +779,13 @@ h2 {
         box-shadow: 0 5px 10px rgba(0,0,0,0.1);
         z-index: 999;
     }
+}
+
+/* Update currency symbols */
+.price::before {
+    content: '₵';
+}
+
+.amount::before {
+    content: '₵';
 }
